@@ -13,7 +13,7 @@
 //----------------------------zmienne------------------------------------------------------------------------;
 uint8_t hour = 0, sec = 0, min = 0;
 uint8_t wasThere = 0, wasThereMin = 0, helpHour = 0, setAlarm = 0;
-uint8_t secA = 0, minA = 0, hourA = 0, blink = 1, isSet = 0;		//A-alarm;
+uint8_t secA = 0, minA = 512, hourA = 0, blink = 1, isSet = 0, ringing = 0;		//A-alarm;
 int hoursTab[] = {0,1,2,3,4,5,6,7,64,65,66,67,68,69,70,71,128,129,130,131,132,133,134,135};
 
 
@@ -24,7 +24,7 @@ void setAlarmF(){
 		minA = 0;
 		PORTC = 0;
 		PORTB = 0b0111000;
-		PORTD = 255;
+		PORTD = 0b00111111;
 		_delay_ms(500);
 	}
 	blink = 0;
@@ -42,6 +42,20 @@ void setAlarmF(){
 	
 	setAlarm = 0;
 
+}
+
+void ring(){
+	PORTD = 0b10000000;
+	//sec++;
+	_delay_ms(1000);
+	//ringing = 1;
+	if(!(bit_is_set(PINB, PINB4))){		//alarm wylacza sie guzikiem od minut;
+		PORTD = min;
+		setAlarm = 0;
+		ringing = 0;
+		min--;
+		_delay_ms(1000);
+	}
 }
 
 
@@ -69,6 +83,9 @@ PORTB = 0b00111000;
 		for ( sec = 0; sec < 60; sec ++){
 			PORTC = sec;
 			PORTD = min;
+			
+			
+			
 			if(!(bit_is_set(PINB, PINB3))){
 				
 				
@@ -86,7 +103,7 @@ PORTB = 0b00111000;
 				
 				while(setAlarm == 1){
 					setAlarmF();
-					
+					ringing = 1;
 					if(isSet == 1){
 						PORTB = hoursTab[hour];
 						min--;
@@ -120,6 +137,13 @@ PORTB = 0b00111000;
 			}
 			
 			PORTB = hoursTab[hour];				//po ustawieniu mu w petli wyzej gdzie ma outputy trzeba wrocic do ustawionej godziny;
+			
+			while(min == minA && ringing == 1){
+				ring();
+			}
+			
+			
+			
 		
 			//--------------------------------ustawianie godzin--------------------------------------------------------------;
 		
