@@ -12,9 +12,37 @@
 
 //----------------------------zmienne------------------------------------------------------------------------;
 uint8_t hour = 0, sec = 0, min = 0;
-uint8_t wasThere = 0, wasThereMin = 0, helpHour = 0;
+uint8_t wasThere = 0, wasThereMin = 0, helpHour = 0, setAlarm = 0;
+uint8_t secA = 0, minA = 0, hourA = 0, blink = 1, isSet = 0;		//A-alarm;
 int hoursTab[] = {0,1,2,3,4,5,6,7,64,65,66,67,68,69,70,71,128,129,130,131,132,133,134,135};
 
+
+void setAlarmF(){
+	
+	while(!(bit_is_set(PINB, PINB4))){
+	if(blink == 1){
+		PORTC = 0;
+		
+		PORTB = 0b0111000;
+		PORTD = 255;
+		_delay_ms(500);
+	}
+	blink = 0;
+	
+	secA = 0;						// do czasu az wcisniety jest przycisk, sekudny sie zatrzymuja, a minuty rosna co sekunda;
+	minA++;
+	if(minA == 60)
+	minA = 0;
+	PORTC = minA;
+	_delay_ms(1000);
+	}
+	
+	isSet = 1;
+	
+	
+	setAlarm = 0;
+
+}
 
 
 
@@ -24,11 +52,11 @@ int main(void){
 DDRC = 0xFF;					// wszystkie piny s¹ outputami -> diody;
 PORTC = 0x00;
 
-DDRD = 0xFF;					//wszystkie piny s¹ outputami -> diody;
+DDRD = 0xFF;					//wszystkie piny s¹ outputami -> diody;t
 PORTD = 0x00;
 
-DDRB = 0b11001111;				//2 piny to przyciski, wiec sa ustawione na inputy;
-PORTB = 0b00110000;
+DDRB = 0b11000111;				//2 piny to przyciski, wiec sa ustawione na inputy;
+PORTB = 0b00111000;
 	
 	
 	
@@ -40,10 +68,36 @@ PORTB = 0b00110000;
 		//--------------------------------petla dla sekund------------------------------------------------------------------;
 		for ( sec = 0; sec < 60; sec ++){
 			PORTC = sec;
+			PORTD = min;
+			if(!(bit_is_set(PINB, PINB3))){
+				
+				
+				setAlarm = 1;
+				PORTD = 7;
+				_delay_ms(1000);	//niech poczeka z 2 sekundy zeby kliknaac nastpeny guzik;
+				//PORTD = min;
+			}
+			
 			
 			//---------------------------------ustawianie minut-------------------------------------------------------------;
 			//while(!(PINB & 0x10)){
 			while(!(bit_is_set(PINB, PINB4))){
+				
+				while(setAlarm == 1){
+					setAlarmF();
+					
+					if(isSet == 1){
+						PORTB = hoursTab[hour];
+						min--;
+						PORTD = min;
+						PORTC = 0;
+						blink = 1;
+						break;
+					}
+				}
+				
+				
+				
 				if(wasThereMin == 0){
 					PORTC = 255;
 					PORTD = 0;
@@ -119,4 +173,6 @@ PORTB = 0b00110000;
     }
 
 }
+
+
 
