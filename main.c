@@ -13,11 +13,11 @@
 //----------------------------zmienne------------------------------------------------------------------------;
 uint8_t hour = 0, sec = 0, min = 0;
 uint8_t wasThere = 0, wasThereMin = 0, helpHour = 0, setAlarm = 0;
-uint8_t secA = 0, minA = 512, hourA = 0, blink = 1, isSet = 0, ringing = 0;		//A-alarm;
+uint8_t secA = 0, minA = 512, hourA = 512, blink = 1, isSet = 0, ringing = 0;		//A-alarm;
 int hoursTab[] = {0,1,2,3,4,5,6,7,64,65,66,67,68,69,70,71,128,129,130,131,132,133,134,135};
 
 
-void setAlarmF(){
+void setAlarmM(){
 	
 	while(!(bit_is_set(PINB, PINB4))){
 	if(blink == 1){
@@ -34,6 +34,7 @@ void setAlarmF(){
 	if(minA == 60)
 	minA = 0;
 	PORTC = minA;
+	sec++;
 	_delay_ms(1000);
 	}
 	
@@ -42,6 +43,31 @@ void setAlarmF(){
 	
 	setAlarm = 0;
 
+}
+
+void setAlarmH(){
+	while(!(bit_is_set(PINB, PINB5))){
+		if(blink == 1){
+			hourA = 0;
+			PORTC = 0;
+			PORTB = 0b0111000;
+			PORTD = 0b00111111;
+			_delay_ms(500);
+		}
+		blink = 0;
+		sec++;
+		secA = 0;						// do czasu az wcisniety jest przycisk, sekudny sie zatrzymuja, a minuty rosna co sekunda;
+		hourA++;
+		if(hourA == 24)
+		hourA = 0;
+		PORTC = hourA;
+		_delay_ms(1000);
+	}
+	
+	isSet = 1;
+	min++;		//naprawa przestawien, ktorych narazie nie moge znalexc;
+	hour--;
+	setAlarm = 0;
 }
 
 void ring(){
@@ -86,6 +112,7 @@ PORTB = 0b00111000;
 			
 			
 			
+			
 			if(!(bit_is_set(PINB, PINB3))){
 				
 				
@@ -102,7 +129,7 @@ PORTB = 0b00111000;
 			while(!(bit_is_set(PINB, PINB4))){
 				
 				while(setAlarm == 1){
-					setAlarmF();
+					setAlarmM();
 					ringing = 1;
 					if(isSet == 1){
 						PORTB = hoursTab[hour];
@@ -138,9 +165,7 @@ PORTB = 0b00111000;
 			
 			PORTB = hoursTab[hour];				//po ustawieniu mu w petli wyzej gdzie ma outputy trzeba wrocic do ustawionej godziny;
 			
-			while(min == minA && ringing == 1){
-				ring();
-			}
+			
 			
 			
 			
@@ -149,6 +174,21 @@ PORTB = 0b00111000;
 		
 		
 				while(!(bit_is_set(PINB, PINB5))){			//warunek dziala -> sukces;
+					
+					while(setAlarm == 1){
+						setAlarmH();
+						ringing = 1;
+						if(isSet == 1){
+							PORTB = hoursTab[hour];
+							min--;
+							PORTD = min;
+							PORTC = 0;
+							blink = 1;
+							break;
+						}
+					}
+					
+					
 					if(wasThere == 0){
 						PORTC = 255;						//niech zamiga wszystkimi diodami, jako ze jest w trybie ustawiania godzin;
 						_delay_ms(500);
@@ -170,6 +210,12 @@ PORTB = 0b00111000;
 			PORTB = hoursTab[hour];
 			wasThere = 0;
 			}
+			
+			
+			while(min == minA && ringing == 1 && hour == hourA){
+				ring();
+			}
+			
 			
 			_delay_ms(1000);
 		}
