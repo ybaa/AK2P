@@ -21,8 +21,8 @@ void setAlarmF(){
 	
 	while(!(bit_is_set(PINB, PINB4))){
 	if(blink == 1){
+		minA = 0;
 		PORTC = 0;
-		
 		PORTB = 0b0111000;
 		PORTD = 255;
 		_delay_ms(500);
@@ -49,10 +49,10 @@ void setAlarmF(){
 int main(void){
 	
 //------------------------porty, piny, ddry------------------------------------------------------------------;
-DDRC = 0xFF;					// wszystkie piny s¹ outputami -> diody;
+DDRC = 0xFF;					// wszystkie piny sš outputami -> diody;
 PORTC = 0x00;
 
-DDRD = 0xFF;					//wszystkie piny s¹ outputami -> diody;t
+DDRD = 0xFF;					//wszystkie piny sš outputami -> diody;t
 PORTD = 0x00;
 
 DDRB = 0b11000111;				//2 piny to przyciski, wiec sa ustawione na inputy;
@@ -73,8 +73,9 @@ PORTB = 0b00111000;
 				
 				
 				setAlarm = 1;
-				PORTD = 7;
-				_delay_ms(1000);	//niech poczeka z 2 sekundy zeby kliknaac nastpeny guzik;
+				//PORTD = 0b00100001;	//tu by³ test czy tu wgl wchodzi, wchodzi wiec niech nie miga tymi diodami 100x
+				PORTD = 0b00111111;
+				_delay_ms(3000);	//niech poczeka z 2 sekundy zeby kliknaac nastpeny guzik;
 				//PORTD = min;
 			}
 			
@@ -173,6 +174,3 @@ PORTB = 0b00111000;
     }
 
 }
-
-
-
