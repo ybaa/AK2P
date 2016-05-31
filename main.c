@@ -35,7 +35,7 @@ void setAlarmM(){
 	minA = 0;
 	PORTC = minA;
 	sec++;
-	_delay_ms(1000);
+	_delay_ms(962);
 	}
 	
 	isSet = 1;
@@ -61,7 +61,7 @@ void setAlarmH(){
 		if(hourA == 24)
 		hourA = 0;
 		PORTC = hourA;
-		_delay_ms(1000);
+		_delay_ms(962);
 	}
 	
 	isSet = 1;
@@ -73,14 +73,14 @@ void setAlarmH(){
 void ring(){
 	PORTD = 0b10000000;
 	//sec++;
-	_delay_ms(1000);
+	_delay_ms(962);
 	//ringing = 1;
 	if(!(bit_is_set(PINB, PINB4))){		//alarm wylacza sie guzikiem od minut;
 		PORTD = min;
 		setAlarm = 0;
 		ringing = 0;
 		min--;
-		_delay_ms(1000);
+		_delay_ms(962);
 	}
 }
 
@@ -155,7 +155,7 @@ PORTB = 0b00111000;
 				if(min == 60)
 					min = 0;
 				PORTC = min;
-				_delay_ms(1000);
+				_delay_ms(962);
 			}
 			
 			if(wasThereMin == 1){
@@ -201,7 +201,7 @@ PORTB = 0b00111000;
 				if(hour == 24)
 				hour = 0;
 				PORTC = hour;
-				_delay_ms(1000);
+				_delay_ms(962);
 				
 				
 			}
@@ -217,7 +217,7 @@ PORTB = 0b00111000;
 			}
 			
 			
-			_delay_ms(1000);
+			_delay_ms(962);
 		}
 		
 		
